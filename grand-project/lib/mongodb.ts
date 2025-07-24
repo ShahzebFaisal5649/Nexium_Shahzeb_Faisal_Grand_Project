@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection } from 'mongodb'
+import { MongoClient, Db, Collection, Document } from 'mongodb'
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Database and collection interfaces
-export interface JobAnalysis {
+export interface JobAnalysis extends Document {
   _id?: string
   jobDescriptionId: string
   userId: string
@@ -65,7 +65,7 @@ export interface JobAnalysis {
   updatedAt: Date
 }
 
-export interface ResumeAnalysis {
+export interface ResumeAnalysis extends Document {
   _id?: string
   resumeId: string
   userId: string
@@ -103,7 +103,7 @@ export interface ResumeAnalysis {
   updatedAt: Date
 }
 
-export interface MatchAnalysis {
+export interface MatchAnalysis extends Document {
   _id?: string
   userId: string
   resumeId: string
@@ -136,7 +136,7 @@ export interface MatchAnalysis {
   createdAt: Date
 }
 
-export interface TailoringResult {
+export interface TailoringResult extends Document {
   _id?: string
   userId: string
   originalResumeId: string
@@ -189,7 +189,7 @@ export class MongoDB {
     return this.db
   }
 
-  static async getCollection<T>(name: string): Promise<Collection<T>> {
+  static async getCollection<T extends Document>(name: string): Promise<Collection<T>> {
     const db = await this.getDatabase()
     return db.collection<T>(name)
   }
@@ -201,7 +201,7 @@ export class MongoDB {
       ...analysis,
       createdAt: new Date(),
       updatedAt: new Date()
-    })
+    } as JobAnalysis)
     return result.insertedId.toString()
   }
 
@@ -217,7 +217,7 @@ export class MongoDB {
       ...analysis,
       createdAt: new Date(),
       updatedAt: new Date()
-    })
+    } as ResumeAnalysis)
     return result.insertedId.toString()
   }
 
@@ -232,7 +232,7 @@ export class MongoDB {
     const result = await collection.insertOne({
       ...analysis,
       createdAt: new Date()
-    })
+    } as MatchAnalysis)
     return result.insertedId.toString()
   }
 
@@ -247,7 +247,7 @@ export class MongoDB {
     const insertResult = await collection.insertOne({
       ...result,
       createdAt: new Date()
-    })
+    } as TailoringResult)
     return insertResult.insertedId.toString()
   }
 

@@ -83,7 +83,7 @@ export const applicationSchema = z.object({
   jobTitle: z.string().min(1, 'Job title is required').max(100, 'Job title must be less than 100 characters'),
   applicationDate: z.string().refine((date: string) => !isNaN(Date.parse(date)), 'Please enter a valid date'),
   status: z.enum(['applied', 'screening', 'interview', 'offer', 'rejected', 'withdrawn'], {
-    errorMap: () => ({ message: 'Please select a valid status' }),
+    message: 'Please select a valid status',
   }),
   applicationUrl: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
   notes: z.string().max(1000, 'Notes must be less than 1,000 characters').optional().or(z.literal('')),
@@ -93,7 +93,7 @@ export const applicationSchema = z.object({
 
 export const applicationUpdateSchema = z.object({
   status: z.enum(['applied', 'screening', 'interview', 'offer', 'rejected', 'withdrawn'], {
-    errorMap: () => ({ message: 'Please select a valid status' }),
+    message: 'Please select a valid status',
   }),
   notes: z.string().max(1000, 'Notes must be less than 1,000 characters').optional().or(z.literal('')),
   applicationUrl: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
@@ -104,7 +104,7 @@ export const tailoringRequestSchema = z.object({
   resumeId: z.string().uuid('Please select a valid resume'),
   jobDescriptionId: z.string().uuid('Please select a valid job description'),
   intensity: z.enum(['light', 'moderate', 'aggressive'], {
-    errorMap: () => ({ message: 'Please select a tailoring intensity' }),
+    message: 'Please select a tailoring intensity',
   }),
   lockedSections: z.array(z.string()).default([]),
   customInstructions: z.string().max(500, 'Custom instructions must be less than 500 characters').optional().or(z.literal('')),

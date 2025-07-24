@@ -116,6 +116,10 @@ export default function SignUpPage() {
     }
   }
 
+  const handleTermsChange = (checked: boolean | "indeterminate") => {
+    setAcceptTerms(checked === true)
+  }
+
   if (success) {
     return (
       <Card>
@@ -249,7 +253,7 @@ export default function SignUpPage() {
             <Checkbox
               id="terms"
               checked={acceptTerms}
-              onCheckedChange={setAcceptTerms}
+              onCheckedChange={handleTermsChange}
             />
             <Label htmlFor="terms" className="text-sm">
               I agree to the{' '}
