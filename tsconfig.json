@@ -1,54 +1,54 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "baseUrl": ".",
+    
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@components/*": [
-        "./components/*"
-      ],
-      "@lib/*": [
-        "./lib/*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@lib/*": ["./lib/*"]
     },
+    
+    // Type Checking
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    
+    // Interop
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    
+    // Module Resolution
     "allowJs": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,  // Changed from true to catch missing type definitions
     "isolatedModules": true,
     "resolveJsonModule": true,
     "jsx": "preserve",
+    
+    // Performance
     "incremental": true,
+    
+    // Plugins
     "plugins": [
       {
         "name": "next",
         "optimizeForLint": true
       }
     ],
-    "types": [
-      "node",
-      "jest"
-    ],
-    "typeRoots": [
-      "node_modules/@types",
-      "./types"
-    ],
+    
+    // Type Acquisition
+    "types": ["node"],  // Removed 'jest' - let it be included automatically
+    "typeRoots": ["node_modules/@types", "./types"],
+    
+    // Output
     "noEmit": true
   },
+  
   "include": [
     "next-env.d.ts",
     "**/*.ts",
@@ -57,6 +57,7 @@
     "**/*.jsx",
     ".next/types/**/*.ts"
   ],
+  
   "exclude": [
     "node_modules",
     "**/*.spec.ts",
