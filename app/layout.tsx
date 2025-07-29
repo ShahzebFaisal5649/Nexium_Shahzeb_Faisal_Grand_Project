@@ -1,13 +1,19 @@
 ﻿import { Inter } from 'next/font/google'
-// Import your global CSS
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+// Optimized font loading with variable fonts
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  weight: ['400', '500', '600', '700'],
+})
 
 export const metadata = {
   title: 'Resume Tailor - AI-Powered Resume Optimization',
   description: 'Get more interviews with AI-powered resume optimization. Analyze job descriptions, match keywords, and create tailored resumes in seconds.',
-  keywords: 'resume, AI, optimization, job search, career, ATS, keywords',
+  metadataBase: new URL('https://resume-tailor.com'),
+  keywords: ['resume', 'AI', 'optimization', 'job search', 'career', 'ATS', 'keywords'],
   authors: [{ name: 'Resume Tailor Team' }],
   creator: 'Resume Tailor',
   publisher: 'Resume Tailor',
@@ -48,9 +54,11 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
+      noimageindex: false,
       'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
@@ -64,24 +72,22 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <head>
-        {/* Preconnect to external domains for performance */}
+        {/* Performance Optimizations */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Viewport meta tag for responsive design */}
+        {/* Responsive Meta */}
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         
-        {/* Theme color for mobile browsers */}
-        <meta name="theme-color" content="#3B82F6" />
-        <meta name="color-scheme" content="light" />
+        {/* Theme Configuration */}
+        <meta name="theme-color" content="#3B82F6" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1E40AF" media="(prefers-color-scheme: dark)" />
+        <meta name="color-scheme" content="light dark" />
         
-        {/* Additional performance hints */}
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-        
-        {/* Structured data for SEO */}
+        {/* SEO Enhancements */}
+        <link rel="canonical" href="https://resume-tailor.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -96,70 +102,48 @@ export default function RootLayout({
               "offers": {
                 "@type": "Offer",
                 "price": "19",
-                "priceCurrency": "USD",
-                "priceValidUntil": "2025-12-31"
-              },
-              "creator": {
-                "@type": "Organization",
-                "name": "Resume Tailor"
+                "priceCurrency": "USD"
               }
             })
           }}
         />
       </head>
-      <body 
-        className={`${inter.className} antialiased bg-white text-gray-900 selection:bg-blue-100 selection:text-blue-900`}
-        suppressHydrationWarning
-      >
-        {/* Skip to main content for accessibility */}
+      <body className={`font-sans antialiased bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 selection:bg-blue-100 dark:selection:bg-blue-900 selection:text-blue-900 dark:selection:text-blue-100`}>
+        {/* Accessibility Skip Link */}
         <a 
           href="#main-content" 
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50"
         >
-          Skip to main content
+          Skip to content
         </a>
         
+        {/* Main Content */}
         <div id="root">
-          <main id="main-content">
+          <main id="main-content" className="min-h-screen">
             {children}
           </main>
         </div>
-        
-        {/* Analytics script placeholder */}
+
+        {/* Analytics - Client Component */}
         {process.env.NODE_ENV === 'production' && (
-          <>
-            {/* Google Analytics */}
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  var script = document.createElement('script');
+                  script.src = 'https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}';
+                  script.async = true;
+                  document.head.appendChild(script);
+                  
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
-                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
-                    page_path: window.location.pathname,
-                  });
-                `,
-              }}
-            />
-          </>
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+                })();
+              `,
+            }}
+          />
         )}
-        
-        {/* Service Worker Registration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js');
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   )

@@ -88,7 +88,6 @@ module.exports = {
           from: { transform: 'translateY(0)' },
           to: { transform: 'translateY(-100%)' }
         },
-        // New animations you might find useful
         'spin-slow': {
           from: { transform: 'rotate(0deg)' },
           to: { transform: 'rotate(360deg)' }
@@ -105,10 +104,9 @@ module.exports = {
         'fade-out': 'fade-out 0.2s ease-out',
         'slide-in-from-top': 'slide-in-from-top 0.2s ease-out',
         'slide-out-to-top': 'slide-out-to-top 0.2s ease-out',
-        'spin-slow': 'spin 3s linear infinite',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+        'spin-slow': 'spin-slow 3s linear infinite',
+        'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
       },
-      // Additional useful extensions
       spacing: {
         '128': '32rem',
         '144': '36rem'
@@ -123,9 +121,9 @@ module.exports = {
     }
   },
   plugins: [
-    require("tailwindcss-animate"),
     require("@tailwindcss/forms"),
-    require("@tailwindcss/typography"), // Consider adding if you have rich text
-    require("@tailwindcss/aspect-ratio") // Useful for media elements
+    require("@tailwindcss/typography"),
+    require("@tailwindcss/aspect-ratio"),
+    require("tailwindcss-animate") // Added this for animations
   ],
 }
