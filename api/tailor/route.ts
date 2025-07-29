@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id: userId } = authResult;
+    const { profile: { id: userId } } = authResult;
     const body = await request.json();
     const { action } = body;
 
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
 
       case "tailor": {
         const validatedData = tailoringRequestSchema.parse(body);
-        const tailoringOptions = createTailoringOptions(validatedData);
+        const tailoringOptions: any = createTailoringOptions(validatedData);
         
         const { data: analysis, error: analysisError } = await supabase
           .from("resume_analyses")
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
           .insert({
             user_id: userId,
             title: `${analysis.resumes.title} - Tailored for ${analysis.job_descriptions.company_name}`,
-            is_master: false,
+                        is_master: false,
             extracted_text: tailoredResume.content,
             tailored_from: analysis.resumes.id,
             job_description_id: validatedData.jobDescriptionId,
