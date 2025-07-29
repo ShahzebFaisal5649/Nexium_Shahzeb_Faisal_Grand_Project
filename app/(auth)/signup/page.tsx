@@ -9,8 +9,33 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Loader2, Mail, Lock, Eye, EyeOff, User } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { Loader2, Mail, Lock, Eye, EyeOff, User, UserPlus, CheckCircle } from 'lucide-react'
+
+// Mock auth functions - replace with your actual Supabase implementation
+const signUpWithPassword = async (email: string, password: string, fullName: string) => {
+  await new Promise(resolve => setTimeout(resolve, 1500))
+  
+  // Mock validation
+  if (!email || !password || !fullName) {
+    throw new Error('All fields are required')
+  }
+  
+  if (password.length < 8) {
+    throw new Error('Password must be at least 8 characters long')
+  }
+  
+  // Simulate successful signup
+  return { 
+    success: true, 
+    user: { id: 1, email, full_name: fullName },
+    needsConfirmation: true 
+  }
+}
+
+const signInWithOAuth = async (_provider: string) => {
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  return { success: true }
+}
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -58,8 +83,7 @@ export default function SignUpPage() {
     return true
   }
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSignUp = async () => {
     setError('')
 
     if (!validateForm()) {
@@ -69,26 +93,19 @@ export default function SignUpPage() {
     setLoading(true)
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullName,
-          },
-          emailRedirectTo: `${window.location.origin}/onboarding/welcome`,
-        },
-      })
-
-      if (error) {
-        setError(error.message)
-      } else if (data.user && !data.user.email_confirmed_at) {
-        setSuccess(true)
-      } else {
-        router.push('/onboarding/welcome')
+      const result = await signUpWithPassword(formData.email, formData.password, formData.fullName)
+      
+      if (result.success) {
+        if (result.needsConfirmation) {
+          setSuccess(true)
+        } else {
+          // Direct sign in (if email confirmation is disabled)
+          localStorage.setItem('user', JSON.stringify(result.user))
+          router.push('/dashboard')
+        }
       }
-    } catch (err) {
-      setError('An unexpected error occurred')
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -99,18 +116,10 @@ export default function SignUpPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/onboarding/welcome`,
-        },
-      })
-
-      if (error) {
-        setError(error.message)
-      }
-    } catch (err) {
-      setError('An unexpected error occurred')
+      await signInWithOAuth('google')
+      router.push('/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -122,50 +131,64 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle>Check Your Email</CardTitle>
-          <CardDescription>
-            We've sent a confirmation link to {formData.email}
+      <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+        <CardHeader className="text-center pb-2">
+          <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="h-8 w-8 text-white" />
+          </div>
+          <CardTitle className="text-2xl">Check Your Email</CardTitle>
+          <CardDescription className="text-base">
+            We've sent a confirmation link to <strong>{formData.email}</strong>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert>
-            <Mail className="h-4 w-4" />
-            <AlertDescription>
+          <Alert className="border-green-200 bg-green-50">
+            <Mail className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
               Please check your email and click the confirmation link to activate your account.
             </AlertDescription>
           </Alert>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => setSuccess(false)}
-          >
-            Back to Sign Up
-          </Button>
+          <div className="space-y-3">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setSuccess(false)}
+            >
+              Back to Sign Up
+            </Button>
+            <Button
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              onClick={() => router.push('/signin?signup=success')}
+            >
+              Go to Sign In
+            </Button>
+          </div>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle>Create Your Account</CardTitle>
-        <CardDescription>
+    <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+      <CardHeader className="text-center pb-2">
+        <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <UserPlus className="h-8 w-8 text-white" />
+        </div>
+        <CardTitle className="text-2xl">Create Your Account</CardTitle>
+        <CardDescription className="text-base">
           Start optimizing your resumes with AI
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        <form onSubmit={handleSignUp} className="space-y-4">
+        <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
+            <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
             <div className="relative">
               <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -175,14 +198,13 @@ export default function SignUpPage() {
                 placeholder="Enter your full name"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className="pl-10"
-                required
+                className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -192,14 +214,13 @@ export default function SignUpPage() {
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="pl-10"
-                required
+                className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-sm font-medium">Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -209,13 +230,12 @@ export default function SignUpPage() {
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="pl-10 pr-10"
-                required
+                className="pl-10 pr-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -226,7 +246,7 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -236,38 +256,42 @@ export default function SignUpPage() {
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="pl-10 pr-10"
-                required
+                className="pl-10 pr-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-start space-x-2 pt-2">
             <Checkbox
               id="terms"
               checked={acceptTerms}
               onCheckedChange={handleTermsChange}
+              className="mt-0.5"
             />
-            <Label htmlFor="terms" className="text-sm">
+            <Label htmlFor="terms" className="text-sm leading-5">
               I agree to the{' '}
-              <Link href="/terms" className="text-blue-600 hover:underline">
+              <Link href="/terms" className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-blue-600 hover:underline">
+              <Link href="/privacy" className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
                 Privacy Policy
               </Link>
             </Label>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button 
+            onClick={handleSignUp}
+            className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl" 
+            disabled={loading}
+          >
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -277,20 +301,20 @@ export default function SignUpPage() {
               'Create Account'
             )}
           </Button>
-        </form>
+        </div>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+            <span className="w-full border-t border-gray-200" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+            <span className="bg-white px-2 text-gray-500 font-medium">Or continue with</span>
           </div>
         </div>
 
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full h-11 border-gray-200 hover:bg-gray-50 transition-all duration-300"
           onClick={handleGoogleSignUp}
           disabled={loading}
         >
@@ -317,7 +341,7 @@ export default function SignUpPage() {
 
         <div className="text-center text-sm">
           <span className="text-gray-600">Already have an account? </span>
-          <Link href="/signin" className="text-blue-600 hover:underline">
+          <Link href="/signin" className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
             Sign in
           </Link>
         </div>

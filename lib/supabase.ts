@@ -1,17 +1,40 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Get environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
+// Validate environment variables
+if (!supabaseUrl) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable')
 }
 
+if (!supabaseAnonKey) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable')
+}
+
+// Validate URL format
+if (typeof window !== 'undefined') {
+  try {
+    new URL(supabaseUrl)
+  } catch (error) {
+    console.error('Invalid Supabase URL:', supabaseUrl)
+    throw new Error(`Invalid NEXT_PUBLIC_SUPABASE_URL format: ${supabaseUrl}`)
+  }
+}
+
+// Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'resume-tailor-ai'
+    }
   }
 })
 
@@ -188,4 +211,21 @@ export interface Database {
       [_ in never]: never
     }
   }
+}
+
+// Type-safe database client
+export type SupabaseClient = typeof supabase
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
+export type InsertTables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
+export type UpdateTables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+
+// Helper function for error handling
+export const handleSupabaseError = (error: any) => {
+  console.error('Supabase error:', error)
+  
+  if (error?.message) {
+    return error.message
+  }
+  
+  return 'An unexpected error occurred'
 }

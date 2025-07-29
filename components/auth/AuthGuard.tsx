@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
-import { cn } from '@/lib/utils'  
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/lib/store/authStore'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'

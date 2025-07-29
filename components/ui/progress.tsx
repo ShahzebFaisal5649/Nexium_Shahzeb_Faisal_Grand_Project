@@ -1,16 +1,16 @@
-"use client"
+// Inside @/components/ui/progress.tsx
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
-import { Progress } from "@/components/ui/progress"
-
-export function ProgressDemo() {
-  const [progress, setProgress] = React.useState(13)
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setProgress(66), 500)
-    return () => clearTimeout(timer)
-  }, [])
-
-  return <Progress value={progress} className="w-[60%]" />
+// Define the Progress component
+export function Progress({ value, className }: { value: number; className?: string }) {
+  return (
+    <div className={`bg-gray-200 rounded-full h-2.5 ${className}`}>
+      <div
+        className="bg-blue-600 h-2.5 rounded-full"
+        style={{ width: `${value}%` }}
+      ></div>
+    </div>
+  );
 }

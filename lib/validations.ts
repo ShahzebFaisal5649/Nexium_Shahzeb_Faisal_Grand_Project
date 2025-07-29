@@ -99,17 +99,19 @@ export const applicationUpdateSchema = z.object({
   applicationUrl: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
 })
 
-// Tailoring validation schemas
 export const tailoringRequestSchema = z.object({
   resumeId: z.string().uuid('Please select a valid resume'),
   jobDescriptionId: z.string().uuid('Please select a valid job description'),
-  intensity: z.enum(['light', 'moderate', 'aggressive'], {
+  action: z.enum(["analyze", "tailor", "download"]),
+  intensity: z.enum(["light", "moderate", "aggressive"], {
     message: 'Please select a tailoring intensity',
-  }),
+  }).default("moderate"),
   lockedSections: z.array(z.string()).default([]),
-  customInstructions: z.string().max(500, 'Custom instructions must be less than 500 characters').optional().or(z.literal('')),
-})
-
+  customInstructions: z.string()
+    .max(500, 'Custom instructions must be less than 500 characters')
+    .optional()
+    .or(z.literal('')),
+});
 // Search and filter schemas
 export const searchSchema = z.object({
   query: z.string().max(100, 'Search query must be less than 100 characters').optional().or(z.literal('')),
@@ -203,7 +205,7 @@ export type ProfileFormData = z.infer<typeof profileSchema>
 export type ResumeUploadFormData = z.infer<typeof resumeUploadSchema>
 export type JobDescriptionFormData = z.infer<typeof jobDescriptionSchema>
 export type ApplicationFormData = z.infer<typeof applicationSchema>
-export type TailoringRequestFormData = z.infer<typeof tailoringRequestSchema>
 export type SearchFormData = z.infer<typeof searchSchema>
 export type NotificationSettingsFormData = z.infer<typeof notificationSettingsSchema>
 export type PrivacySettingsFormData = z.infer<typeof privacySettingsSchema>
+export type TailoringRequestFormData = z.infer<typeof tailoringRequestSchema>;

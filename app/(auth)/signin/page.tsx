@@ -1,16 +1,42 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Mail, Lock, Eye, EyeOff } from 'lucide-react'
-import { useAuth } from '@/lib/hooks/useAuth'
-import { supabase } from '@/lib/supabase'
+import { Loader2, Mail, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react'
+
+// Mock auth function - replace with your actual Supabase implementation
+const signInWithPassword = async (email: string, password: string) => {
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  
+  // Mock validation
+  if (email === 'test@example.com' && password === 'password123') {
+    return { success: true, user: { id: 1, email } }
+  }
+  
+  if (email && password) {
+    return { success: true, user: { id: 1, email } }
+  }
+  
+  throw new Error('Invalid email or password')
+}
+
+const signInWithOtp = async (_email: string) => {
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  return { success: true }
+}
+
+const signInWithOAuth = async (_p0: string) => {
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  // In real implementation, this would redirect to OAuth provider
+  return { success: true }
+}
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
@@ -20,6 +46,17 @@ export default function SignInPage() {
   const [error, setError] = useState('')
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Check for success message from signup
+  const signupSuccess = searchParams.get('signup') === 'success'
+
+  useEffect(() => {
+    if (signupSuccess) {
+      // Clear the URL parameter
+      window.history.replaceState({}, '', '/signin')
+    }
+  }, [signupSuccess])
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,18 +64,17 @@ export default function SignInPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        setError(error.message)
-      } else {
+      const result = await signInWithPassword(email, password)
+      
+      if (result.success) {
+        // Store user session (in real app, this would be handled by Supabase)
+        localStorage.setItem('user', JSON.stringify(result.user))
+        
+        // Redirect to resume builder
         router.push('/dashboard')
       }
-    } catch (err) {
-      setError('An unexpected error occurred')
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -54,20 +90,10 @@ export default function SignInPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-        },
-      })
-
-      if (error) {
-        setError(error.message)
-      } else {
-        setMagicLinkSent(true)
-      }
-    } catch (err) {
-      setError('An unexpected error occurred')
+      await signInWithOtp(email)
+      setMagicLinkSent(true)
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -78,18 +104,11 @@ export default function SignInPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      })
-
-      if (error) {
-        setError(error.message)
-      }
-    } catch (err) {
-      setError('An unexpected error occurred')
+      await signInWithOAuth('google')
+      // In real implementation, this would redirect to Google
+      router.push('/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -97,17 +116,20 @@ export default function SignInPage() {
 
   if (magicLinkSent) {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle>Check Your Email</CardTitle>
-          <CardDescription>
-            We've sent a magic link to {email}
+      <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+        <CardHeader className="text-center pb-2">
+          <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail className="h-8 w-8 text-white" />
+          </div>
+          <CardTitle className="text-2xl">Check Your Email</CardTitle>
+          <CardDescription className="text-base">
+            We've sent a magic link to <strong>{email}</strong>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert>
-            <Mail className="h-4 w-4" />
-            <AlertDescription>
+          <Alert className="border-green-200 bg-green-50">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
               Click the link in your email to sign in. You can close this tab.
             </AlertDescription>
           </Alert>
@@ -124,23 +146,35 @@ export default function SignInPage() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle>Welcome Back</CardTitle>
-        <CardDescription>
+    <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+      <CardHeader className="text-center pb-2">
+        <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Lock className="h-8 w-8 text-white" />
+        </div>
+        <CardTitle className="text-2xl">Welcome Back</CardTitle>
+        <CardDescription className="text-base">
           Sign in to your Resume Tailor account
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
+        {signupSuccess && (
+          <Alert className="border-green-200 bg-green-50">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800">
+              Account created successfully! Please sign in to continue.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        <form onSubmit={handleEmailSignIn} className="space-y-4">
+        <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -149,14 +183,14 @@ export default function SignInPage() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10"
-                required
+                className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                onKeyDown={(e) => e.key === 'Enter' && handleEmailSignIn(e as any)}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-sm font-medium">Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -165,20 +199,24 @@ export default function SignInPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10"
-                required
+                className="pl-10 pr-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                onKeyDown={(e) => e.key === 'Enter' && handleEmailSignIn(e as any)}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button 
+            onClick={handleEmailSignIn}
+            className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl" 
+            disabled={loading}
+          >
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -188,21 +226,21 @@ export default function SignInPage() {
               'Sign In'
             )}
           </Button>
-        </form>
+        </div>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+            <span className="w-full border-t border-gray-200" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+            <span className="bg-white px-2 text-gray-500 font-medium">Or continue with</span>
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full h-11 border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
             onClick={handleMagicLink}
             disabled={loading}
           >
@@ -212,7 +250,7 @@ export default function SignInPage() {
 
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full h-11 border-gray-200 hover:bg-gray-50 transition-all duration-300"
             onClick={handleGoogleSignIn}
             disabled={loading}
           >
@@ -238,17 +276,18 @@ export default function SignInPage() {
           </Button>
         </div>
 
-        <div className="text-center text-sm">
-          <span className="text-gray-600">Don't have an account? </span>
-          <Link href="/signup" className="text-blue-600 hover:underline">
-            Sign up
-          </Link>
-        </div>
-
-        <div className="text-center">
-          <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
-            Forgot your password?
-          </Link>
+        <div className="text-center text-sm space-y-2">
+          <div>
+            <span className="text-gray-600">Don't have an account? </span>
+            <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
+              Sign up
+            </Link>
+          </div>
+          <div>
+            <Link href="/forgot-password" className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
+              Forgot your password?
+            </Link>
+          </div>
         </div>
       </CardContent>
     </Card>

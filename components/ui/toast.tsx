@@ -52,6 +52,5 @@ export {
   ToastDescription,
   ToastProvider,
   ToastTitle,
-  ToastViewport,
-  type ToastProps, // Add this line
+  ToastViewport, // Add this line
 }

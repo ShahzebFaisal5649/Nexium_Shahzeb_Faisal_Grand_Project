@@ -38,12 +38,16 @@
     "/w44265",
     "/w14928"
   ],
+  
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useAddressSanitizer": false,
   "C_Cpp_Runner.useLeakSanitizer": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.useMsvc": false,
   "C_Cpp_Runner.useUndefinedSanitizer": false,
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
   "C_Cpp_Runner.warnings": [
     "-Wall",
     "-Wextra",
