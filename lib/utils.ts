@@ -4,7 +4,6 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
 // Date utilities
 export const formatDate = (date: string | Date, format: 'short' | 'long' | 'relative' = 'short') => {
   const dateObj = typeof date === 'string' ? new Date(date) : date
@@ -122,7 +121,7 @@ export const chunk = <T>(array: T[], size: number): T[][] => {
 }
 
 export const unique = <T>(array: T[]): T[] => {
-  return [...new Set(array)] // should now work without errors
+  return array.filter((item, index) => array.indexOf(item) === index)
 }
 
 export const groupBy = <T, K extends keyof any>(

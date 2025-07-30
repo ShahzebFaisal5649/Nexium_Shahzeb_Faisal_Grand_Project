@@ -1,17 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es2022",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
-    "moduleResolution": "bundler",
     "baseUrl": ".",
     
     "paths": {
       "@/*": ["./*"],
       "@components/*": ["./components/*"],
+      "@heroicons/react": ["node_modules/@heroicons/react"],
       "@lib/*": ["./lib/*"]
     },
     
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "build",
+    "sourceMap": true,
+
     // Type Checking
     "strict": true,
     "noUnusedLocals": true,
