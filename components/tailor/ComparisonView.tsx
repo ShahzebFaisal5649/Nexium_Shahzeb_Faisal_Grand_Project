@@ -1,4 +1,5 @@
-﻿// components/tailor/ComparisonView.tsx
+﻿"use client";
+// components/tailor/ComparisonView.tsx
 import React, { useState } from 'react';
 
 interface ResumeVersion {

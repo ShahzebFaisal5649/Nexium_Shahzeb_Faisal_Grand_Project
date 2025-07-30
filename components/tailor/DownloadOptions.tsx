@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+
 import { 
   Download, 
   FileText, 
@@ -63,7 +64,7 @@ const colorSchemes = [
   { value: 'black', label: 'Elegant Black', color: 'bg-black' },
 ];
 
-export default function DownloadOptions({ onDownload, isLoading = false }: DownloadOptionsProps) {
+export function DownloadOptions({ onDownload, isLoading = false }: DownloadOptionsProps) {
   const [config, setConfig] = useState<DownloadConfig>({
     format: 'pdf',
     template: 'professional',
@@ -398,3 +399,6 @@ export default function DownloadOptions({ onDownload, isLoading = false }: Downl
     </div>
   );
 }
+
+// Add this at the end of your file, replacing the existing export
+export default DownloadOptions;

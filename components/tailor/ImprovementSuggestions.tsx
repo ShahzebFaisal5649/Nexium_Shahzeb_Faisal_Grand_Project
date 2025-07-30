@@ -1,4 +1,5 @@
-﻿// components/tailor/ImprovementSuggestions.tsx
+﻿"use client";
+// components/tailor/ImprovementSuggestions.tsx
 import React, { useState } from 'react';
 
 interface Suggestion {

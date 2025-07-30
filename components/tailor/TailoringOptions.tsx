@@ -47,7 +47,7 @@ const focusAreaOptions = [
   { id: 'keywords', label: 'Industry Keywords', icon: Target },
 ];
 
-export default function TailoringOptions({ onTailor, isLoading = false }: TailoringOptionsProps) {
+export function TailoringOptions({ onTailor, isLoading = false }: TailoringOptionsProps) {
   const [config, setConfig] = useState<TailoringConfig>({
     jobDescription: '',
     focusAreas: ['technical-skills', 'experience'],
@@ -307,7 +307,7 @@ export default function TailoringOptions({ onTailor, isLoading = false }: Tailor
                 return area ? (
                   <Badge key={areaId} variant="secondary">
                     {area.label}
-                  </Badge>
+                                    </Badge>
                 ) : null;
               })}
             </div>
@@ -317,3 +317,6 @@ export default function TailoringOptions({ onTailor, isLoading = false }: Tailor
     </div>
   );
 }
+
+// Add this at the end of your file, replacing the existing export
+export default TailoringOptions;

@@ -1,5 +1,5 @@
+"use client";
 import React, { useState } from 'react';
-
 interface NotificationPreferences {
   emailNotifications: boolean;
   pushNotifications: boolean;

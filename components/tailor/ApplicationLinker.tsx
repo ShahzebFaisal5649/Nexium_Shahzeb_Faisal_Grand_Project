@@ -1,3 +1,4 @@
+"use client";
 // components/tailor/ApplicationLinker.tsx
 import React, { useState } from 'react';
 

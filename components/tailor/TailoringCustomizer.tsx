@@ -1,4 +1,5 @@
-﻿// components/tailor/TailoringCustomizer.tsx
+﻿"use client";
+// components/tailor/TailoringCustomizer.tsx
 import React, { useState } from 'react';
 
 interface CustomizationOptions {

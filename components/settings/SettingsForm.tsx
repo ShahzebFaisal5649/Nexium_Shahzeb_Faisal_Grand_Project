@@ -1,3 +1,4 @@
+"use client";
 // components/settings/SettingsForm.tsx
 import React, { useState } from 'react';
 

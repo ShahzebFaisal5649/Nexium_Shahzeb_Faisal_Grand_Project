@@ -98,6 +98,9 @@ importers:
       next-pwa:
         specifier: ^5.6.0
         version: 5.6.0(@babel/core@7.28.0)(@types/babel__core@7.20.5)(next@15.4.5(@babel/core@7.28.0)(@playwright/test@1.54.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(webpack@5.101.0)
+      openai:
+        specifier: ^5.10.2
+        version: 5.10.2(ws@8.18.3)(zod@3.25.76)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -4714,6 +4717,18 @@ packages:
   onetime@7.0.0:
     resolution: {integrity: sha512-VXJjc87FScF88uafS3JllDgvAm+c/Slfz06lorj2uAY34rlUu0Nt+v8wreiImcrgAjjIHp1rXpTDlLOGw29WwQ==}
     engines: {node: '>=18'}
+
+  openai@5.10.2:
+    resolution: {integrity: sha512-n+vi74LzHtvlKcDPn9aApgELGiu5CwhaLG40zxLTlFQdoSJCLACORIPC2uVQ3JEYAbqapM+XyRKFy2Thej7bIw==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.23.8
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -11284,6 +11299,11 @@ snapshots:
   onetime@7.0.0:
     dependencies:
       mimic-function: 5.0.1
+
+  openai@5.10.2(ws@8.18.3)(zod@3.25.76):
+    optionalDependencies:
+      ws: 8.18.3
+      zod: 3.25.76
 
   optionator@0.9.4:
     dependencies:

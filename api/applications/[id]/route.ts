@@ -2,20 +2,21 @@ import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 import { AuthService } from "@/lib/auth"
 import { applicationUpdateSchema } from "@/lib/validations"
-import { apiRateLimit } from "@/lib/rate-limit"
+import { defaultRateLimit } from "@/lib/rate-limit"
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const { success: rateLimitSuccess } = await apiRateLimit.limit(request.ip!)
+  const ip = request.headers.get('x-forwarded-for') || 'anonymous';
+const { success: rateLimitSuccess } = await defaultRateLimit.limit(ip);
   if (!rateLimitSuccess) {
     return new NextResponse("Too many requests", { status: 429 })
   }
 
   try {
-    const { user, error: authError } = await AuthService.getCurrentUser()
-    if (authError || !user) {
+    const user = await AuthService.getCurrentUser()
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
@@ -49,14 +50,15 @@ export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const { success: rateLimitSuccess } = await apiRateLimit.limit(request.ip!)
+  const ip = request.headers.get('x-forwarded-for') || 'anonymous';
+const { success: rateLimitSuccess } = await defaultRateLimit.limit(ip);
   if (!rateLimitSuccess) {
     return new NextResponse("Too many requests", { status: 429 })
   }
 
   try {
-    const { user, error: authError } = await AuthService.getCurrentUser()
-    if (authError || !user) {
+    const user = await AuthService.getCurrentUser()
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
@@ -116,14 +118,15 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const { success: rateLimitSuccess } = await apiRateLimit.limit(request.ip!)
+  const ip = request.headers.get('x-forwarded-for') || 'anonymous';
+const { success: rateLimitSuccess } = await defaultRateLimit.limit(ip);
   if (!rateLimitSuccess) {
     return new NextResponse("Too many requests", { status: 429 })
   }
 
   try {
-    const { user, error: authError } = await AuthService.getCurrentUser()
-    if (authError || !user) {
+    const user = await AuthService.getCurrentUser()
+    if (!user) {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 

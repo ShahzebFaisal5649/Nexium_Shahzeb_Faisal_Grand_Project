@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { 
   Download, 
   Edit, 
@@ -31,7 +32,7 @@ interface TailoringResults {
   suggestions: string[];
 }
 
-export default function TailoredResumePreview({ 
+export function TailoredResumePreview({ 
   resumeData, 
   tailoringResults, 
   onEdit, 
@@ -279,3 +280,6 @@ export default function TailoredResumePreview({
     </div>
   );
 }
+
+// Add this at the end of your file, replacing the existing export
+export default TailoredResumePreview;

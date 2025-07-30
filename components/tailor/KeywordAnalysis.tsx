@@ -1,4 +1,5 @@
-﻿// components/tailor/KeywordAnalysis.tsx
+﻿"use client";
+// components/tailor/KeywordAnalysis.tsx
 import React, { useState } from 'react';
 
 interface KeywordData {
